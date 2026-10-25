@@ -1,6 +1,6 @@
 """
-台灣常用社群 8 站 keyword 抓取器（Playwright over CDP，接一顆已登入的 Chrome）
-支援站點：reddit dcard ani ptt m01 x threads ig（含 all）
+台灣常用社群免登入 5 站 keyword 抓取器（Playwright over CDP，接一顆可偵錯的 Chrome）
+支援站點：reddit dcard ani ptt m01（含 all）
 Each site's method was verified on 2026-10-25; sites update, so treat methods as
 provisional — every fetcher returns {'error':'EMPTY','probe':<首兩行DOM>} on zero
 results, so you can re-probe the live DOM and patch this file instead of trusting
@@ -8,7 +8,7 @@ a fixed flow.
 用法：
   python tw_forums.py [站點...] [--kw "關鍵字"] [--n 3]
   例：python tw_forums.py ptt dcard --kw "AI Agent" --n 5
-前提：先開一顆帶 --remote-debugging-port 的 Chrome（各站登入態存在該 profile），
+前提：先開一顆帶 --remote-debugging-port 的 Chrome（免登入站，無需帳號態），
   並 set CRAWLER_CDP_URL=http://127.0.0.1:<port>（預設 9222）。
 各站方法與板塊辨識（2026-10-25 實測）見 README.md。
 """
@@ -29,7 +29,7 @@ async def reddit(pg, kw, n):
     await pg.wait_for_timeout(5000)
     for _ in range(3):
         await pg.mouse.wheel(0, 2200); await pg.wait_for_timeout(1500)
-    items = await pg.evaluate("""(n) => {
+    items = await pg.evaluate(r"""(n) => {
         const posts=[...document.querySelectorAll('shreddit-post')];
         if (posts.length) return posts.slice(0,n).map(p => ({
             title:(p.getAttribute('post-title')||'').trim(), sub:(p.getAttribute('subreddit-prefixed-name')||'').trim(),
@@ -50,7 +50,7 @@ async def reddit(pg, kw, n):
 async def dcard(pg, kw, n):
     await pg.goto(f"https://www.dcard.tw/search?query={kw.replace(' ','%20')}", wait_until="domcontentloaded", timeout=45000)
     await pg.wait_for_timeout(6000)
-    return await pg.evaluate("""(n) => {
+    return await pg.evaluate(r"""(n) => {
         const NL=String.fromCharCode(10);
         const out=[];
         for (const a of document.querySelectorAll('article')) {
@@ -68,7 +68,7 @@ async def dcard(pg, kw, n):
 async def ani(pg, kw, n):
     await pg.goto(f"https://ani.gamer.com.tw/search.php?keyword={kw.replace(' ','%20')}", wait_until="domcontentloaded", timeout=45000)
     await pg.wait_for_timeout(7000)  # XHR 渲染，需多等
-    return await pg.evaluate("""(n) => {
+    return await pg.evaluate(r"""(n) => {
         const NL=String.fromCharCode(10);
         const lines=((document.body&&document.body.innerText)||'').split(NL).map(x=>x.trim()).filter(x=>x && x!=='remove_red_eye' && x!=='雙語');
         const out=[]; 
@@ -92,7 +92,7 @@ async def ptt(pg, kw, n):
         await pg.wait_for_timeout(7000)
     except Exception:
         pass
-    return await pg.evaluate("""(n) => {
+    return await pg.evaluate(r"""(n) => {
         const links=[...document.querySelectorAll('a')].filter(a=>/ptt\.cc\/bbs\/.+\/(M|G)\./.test(a.href||''));
         const seen=new Set(),out=[];
         for (const a of links){const t=(a.innerText||'').trim().replace(/\s*[-–]?\s*批踢踢實業坊\s*$/,''); const board=(a.href.match(/\/bbs\/([A-Za-z0-9_-]+)\//)||[])[1]||''; if(t.length>6&&!seen.has(a.href)){seen.add(a.href);out.push({title:t.slice(0,80),board,link:a.href});}}
@@ -102,82 +102,15 @@ async def ptt(pg, kw, n):
 async def m01(pg, kw, n):
     await pg.goto(f"https://www.mobile01.com/googlesearch.php?query={kw.replace(' ','%20')}", wait_until="domcontentloaded", timeout=45000)
     await pg.wait_for_timeout(6000)
-    return await pg.evaluate("""(n) => {
+    return await pg.evaluate(r"""(n) => {
         const as=[...document.querySelectorAll('a')].filter(a=>/topicdetail|\/topic\/\d+/.test(a.href||'')&&(a.innerText||'').trim().length>8);
         const seen=new Set(),out=[];
         for (const a of as){const t=(a.innerText||'').trim().split(String.fromCharCode(10))[0]; if(!seen.has(t)){seen.add(t);out.push({title:t.slice(0,90),link:a.href});}}
         return out.slice(0,n);
     }""", n)
 
-async def x(pg, kw, n):
-    await pg.goto(f"https://x.com/search?f=live&q={kw.replace(' ','%20')}", wait_until="domcontentloaded", timeout=45000)
-    await pg.wait_for_timeout(6000)
-    for _ in range(2):
-        await pg.mouse.wheel(0, 1800); await pg.wait_for_timeout(1500)
-    return await pg.evaluate("""(n) => {
-        const NL=String.fromCharCode(10);
-        const out=[];
-        for (const art of document.querySelectorAll('article')) {
-            const link=(art.querySelector('a[href*="/status/"]')||{}).href||'';
-            const lines=(art.innerText||'').split(NL).map(x=>x.trim()).filter(Boolean);
-            if (lines.length>=4) out.push({user: lines[0], handle: lines[1], time: lines[2], text: lines.slice(3,6).join(' ').slice(0,160), link});
-            if (out.length>=n) break;
-        }
-        return out;
-    }""", n)
-
-async def threads(pg, kw, n):
-    await pg.goto(f"https://www.threads.com/search?q={kw.replace(' ','%20')}&serp_type=default", wait_until="domcontentloaded", timeout=45000)
-    await pg.wait_for_timeout(9000)
-    for _ in range(2):
-        await pg.mouse.wheel(0, 1500); await pg.wait_for_timeout(1500)
-    return await pg.evaluate("""(n) => {
-        const NL=String.fromCharCode(10);
-        const seen=new Set(), out=[];
-        // 搜尋頁無 article：post 連結 /@USER/post/ID，往內層找承載文字的卡片
-        for (const a of document.querySelectorAll('a[href^="/@"]')) {
-            const href=a.getAttribute('href')||'';
-            const m=href.match(/^\/@([A-Za-z0-9._]+)\/post\/([A-Za-z0-9_-]+)$/);
-            if (!m || seen.has(href)) continue;
-            let box=a, lines=[];
-            for (let i=0;i<8&&box;i++){
-                const L=(box.innerText||'').split(NL).map(x=>x.trim()).filter(Boolean);
-                if (L.length>=4){ lines=L; break; }
-                box=box.parentElement;
-            }
-            if (lines.length<3) continue;
-            seen.add(href);
-            const text=lines.filter(l=>l.length>6&&!/^\d/.test(l)&&!/說讚|追蹤|其他|・/.test(l)).join(' ').slice(0,150);
-            out.push({user: m[1], text: text||lines.slice(0,3).join(' '), link:'https://www.threads.com'+href});
-            if (out.length>=n) break;
-        }
-        return out;
-    }""", n)
-
-async def ig(pg, kw, n):
-    # IG 無關鍵字全文搜尋：單字走 hashtag 頁，多字（含空白）走首頁 feed
-    url = ("https://www.instagram.com/explore/tags/" + kw.replace(" ", "").lower() + "/") if " " not in kw else "https://www.instagram.com/"
-    await pg.goto(url, wait_until="domcontentloaded", timeout=45000)
-    await pg.wait_for_timeout(6000)
-    for _ in range(3):
-        await pg.mouse.wheel(0, 1800); await pg.wait_for_timeout(1500)
-    return await pg.evaluate("""(n) => {
-        const NL=String.fromCharCode(10);
-        const out=[];
-        for (const art of document.querySelectorAll('article')) {
-            const a=art.querySelector('a[href*="/p/"],a[href*="/reel/"]');
-            if (!a) continue;
-            const lines=(art.innerText||'').split(NL).map(x=>x.trim()).filter(Boolean);
-            const img=art.querySelector('img[alt]');
-            const alt=(img&&img.alt&&img.alt.length>3)?img.alt.slice(0,120):'';
-            out.push({user: lines[0]||'', caption: (lines.find(l=>l.length>15||alt)||'').slice(0,150), link: a.href});
-            if (out.length>=n) break;
-        }
-        return out;
-    }""", n)
-
-SITE_FN = {"reddit": reddit, "dcard": dcard, "ani": ani, "ptt": ptt, "m01": m01, "x": x, "threads": threads, "ig": ig}
-SITE_PAT = {"reddit": "reddit.com", "dcard": "dcard.tw", "ani": "ani.gamer", "ptt": "ptt.cc", "m01": "mobile01", "x": "x.com", "threads": "threads.com", "ig": "instagram.com"}
+SITE_FN = {"reddit": reddit, "dcard": dcard, "ani": ani, "ptt": ptt, "m01": m01}
+SITE_PAT = {"reddit": "reddit.com", "dcard": "dcard.tw", "ani": "ani.gamer", "ptt": "ptt.cc", "m01": "mobile01"}
 
 async def main():
     args = [a for a in sys.argv[1:]]
