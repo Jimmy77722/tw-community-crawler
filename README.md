@@ -20,32 +20,34 @@
 
 ## 快速開始
 
-1. 開一顆帶遠端偵錯的 Chrome（免登入站，無需帳號態）：
+1. 安裝（含瀏覽器站的額外依賴）：
+   ```bash
+   pip install -e ".[browser]"
+   ```
+2. 只有 `method: browser` 的站（Dcard、ani）需要一顆帶遠端偵錯的 Chrome：
    ```bash
    chrome --remote-debugging-port=9222 --user-data-dir=<你的 profile>
    ```
-2. 安裝依賴：
-   ```bash
-   pip install playwright
-   ```
 3. 跑一把：
    ```bash
-   python scripts/tw_forums.py ptt dcard --kw "AI Agent" --n 5
-   python scripts/tw_forums.py all --kw "RTX Spark"          # 全部 5 站
+   tw-crawler ptt reddit --kw "AI Agent" --n 10
+   tw-crawler all --kw "RTX Spark" --cdp http://127.0.0.1:9222
    ```
-   環境變數：`CRAWLER_CDP_URL`（預設 `http://127.0.0.1:9222`）、`CRAWLER_OUT_DIR`（輸出目錄，預設專案內 `output/`）。
+   環境變數：`CRAWLER_CDP_URL`（預設 `http://127.0.0.1:9222`）。
 
 ## 輸出
 
-每站一列 JSON：有結果時 `{count, items:[{title/board/user/link...}]}`；
-抓 0 筆時 `{count:0, error:"EMPTY", probe:<首兩行DOM>, url}`——probe 就是給你重探結構用的。
-結果另存 `output/forums_<關鍵字>_<日期>.jsonl`（輸出目錄不進版控）。`samples/` 附實測輸出範例。
+每站結果印在終端機；有結果時 `{site, count, items:[...]}`，
+每筆 item 過 pydantic 驗證的統一欄位：`site id author time title text url likes comments fetched_at`
+（time＝ISO 8601 台灣時區）。依 `site+id` 站內去重。
+抓 0 筆時回 `{count:0, error:"EMPTY", probe:<首兩行DOM>}`——probe 就是給你重探結構用的。
+結果另存 `output/<站>_<關鍵字>_<日期>.jsonl`（一行一筆；輸出目錄不進版控）。`samples/` 附輸出範例。
 
 ## 失效怎麼修（本專案的核心精神）
 
-1. 看到 `EMPTY` → 用瀏覽器開同一個 URL，看結果 DOM 換了什麼容器。
-2. 只改對應站點函數的 selector／等待時間，不動其他站。
-3. 修好後更新函數 docstring 的「最後驗證日期」。
+1. 看到 `EMPTY` → 加 `--save-html` 重跑，或直接開 `sites/<站>.yaml` 附的 `search_url`，看 DOM 換了什麼容器。
+2. 只改對應站的 `sites/<站>.yaml`（網址樣板、method、選擇器、欄位對應），不動程式和其他站。
+3. 修好後更新該站的實測備註。
 
 ## samples/
 
