@@ -38,6 +38,12 @@ def _sleep_gap(site: str, lo: float, hi: float) -> None:
     time.sleep(wait)
 
 
+def polite_gap(site: str, rate: tuple[float, float]) -> None:
+    """瀏覽器路徑用的禮貌等待：先等限速間隔，再登記本次呼叫時間。"""
+    _sleep_gap(site, *rate)
+    _last_call[site] = time.monotonic()
+
+
 @retry(
     retry=retry_if_exception_type((httpx.TransportError,)),
     stop=stop_after_attempt(3),
@@ -48,8 +54,11 @@ def _do_get(url: str, headers: dict, timeout: float) -> httpx.Response:
     return httpx.get(url, headers=headers, follow_redirects=True, timeout=timeout)
 
 
+DEFAULT_RATE = (2.0, 5.0)  # 預設禮貌限速：每次請求間隔 2–5 秒隨機，sites yaml 可用 rate_limit 覆寫
+
+
 def polite_get(site: str, url: str, headers: dict | None = None,
-               rate: tuple[float, float] = (2.0, 5.0), timeout: float = 20.0) -> httpx.Response:
+               rate: tuple[float, float] = DEFAULT_RATE, timeout: float = 20.0) -> httpx.Response:
     """唯一進出口：限速 → 請求（瞬時錯誤退避重試）→ 限速/驗證頁丟 RateLimited。"""
     _sleep_gap(site, *rate)
     h = {"User-Agent": UA, "Accept-Language": "zh-TW", "Accept": "*/*"}

@@ -5,6 +5,7 @@ method: browser
 search_url: "https://pttweb.cc/search?q={kw}"
 wait_selector: "a[href*='.html']"
 settle_ms: 3000   # Google CSE 結果延遲渲染
+rate_limit: [3, 6]   # 本機測得搜尋站較慢，限速放寬；未設定的站預設 2–5 秒隨機
 max_items: 20
 extract:
   rule: link

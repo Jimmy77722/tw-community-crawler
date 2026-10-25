@@ -43,6 +43,13 @@
 抓 0 筆時回 `{count:0, error:"EMPTY", probe:<首兩行DOM>}`——probe 就是給你重探結構用的。
 結果另存 `output/<站>_<關鍵字>_<日期>.jsonl`（一行一筆；輸出目錄不進版控）。`samples/` 附輸出範例。
 
+## 禮貌爬取
+
+- 限速：每次請求（含開瀏覽器頁面前）同站隨機等 2–5 秒；站點可在 yaml 用 `rate_limit: [lo, hi]` 覆寫。
+- 單次上限：結果筆數取 `--n` 與站點 `max_items` 中較嚴者。
+- 遇到 429、403、「暫時限制」或驗證頁：該站立即禮貌停止並回報 `RATE_LIMIT`，不重試硬闖（只有瞬時傳輸錯誤才指數退避）。
+- 不做 UA 偽裝、不隱藏 webdriver；UA 是誠實可辨識的字串：`tw-community-crawler/<版本> (+repo 網址)`，方便站方辨識與聯絡。
+
 ## 失效怎麼修（本專案的核心精神）
 
 1. 看到 `EMPTY` → 加 `--save-html` 重跑，或直接開 `sites/<站>.yaml` 附的 `search_url`，看 DOM 換了什麼容器。

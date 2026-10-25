@@ -9,7 +9,7 @@ import logging
 import urllib.parse
 
 from .config import load_site
-from .http_client import RateLimited, polite_get
+from .http_client import RateLimited, polite_gap, polite_get
 from .parsers import parse_html, parse_json, parse_text_rule
 from .schema import now_iso
 
@@ -32,6 +32,8 @@ def _crawl_browser_sync(site: str, cfg: dict, kw: str, cdp_url: str, n: int):
         ctx = browser.contexts[0]
         page = ctx.new_page()          # 自己開的分頁
         try:
+            # 禮貌限速：開頁前先等待（跟 HTTP 走同一個每站間隔狀態）
+            polite_gap(site, tuple(cfg.get("rate_limit", [2.0, 5.0])))
             page.goto(url, wait_until="domcontentloaded")
             wait_sel = cfg.get("wait_selector")
             try:
@@ -73,15 +75,16 @@ def crawl_site(site: str, kw: str, n: int, out_dir, cdp_url: str,
     cfg = load_site(site)
     url = cfg["search_url"].format(kw=urllib.parse.quote(kw), n=n)
     posts, meta = [], {"url": url}
+    rate = tuple(cfg.get("rate_limit", [2.0, 5.0]))  # 每站可覆寫限速；預設 2–5 秒隨機
     try:
         if cfg["method"] == "api":
-            resp = polite_get(site, url)
+            resp = polite_get(site, url, rate=rate)
             if save_html:
                 _save_raw(out_dir, site, resp.text)
             data = jsonlib.loads(resp.text)
             posts = parse_json(site, cfg, data)
         elif cfg["method"] == "html":
-            resp = polite_get(site, url)
+            resp = polite_get(site, url, rate=rate, headers=cfg.get("headers"))
             if save_html:
                 _save_raw(out_dir, site, resp.text)
             posts = parse_html(site, cfg, resp.text)
@@ -106,6 +109,8 @@ def crawl_site(site: str, kw: str, n: int, out_dir, cdp_url: str,
             continue
         seen.add(p.key())
         uniq.append(p)
+    # 單次上限筆數：取 CLI --n 與站點 max_items 中較嚴者
+    uniq = uniq[: min(n, cfg.get("max_items", 20))]
     items = [p.model_dump() for p in uniq]
     result = {"site": site, "count": len(items), "items": items,
               "fetched_at": now_iso(), **meta}
