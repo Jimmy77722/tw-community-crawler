@@ -1,13 +1,15 @@
-# Mobile01：googlesearch.php（searchresult.php 已 404）
+# Mobile01：googlesearch.php 直連 HTTP 會被 403（本機實測），用 browser 開
+# 即正常渲染 30 筆結果。連結是 topicdetail.php，不用登入。
 site: m01
-method: html
+method: browser
 search_url: "https://www.mobile01.com/googlesearch.php?query={kw}"
-wait_selector: null
+wait_selector: "a[href*='topicdetail']"
 max_items: 20
 extract:
+  base_url: "https://www.mobile01.com"
   rule: link
   container: "a"
   link_filter: "topicdetail"
-  id_regex: "[?&]t=(\\d+)"
+  id_regex: "[?&]t=(\\d+)"        # Mobile01 文章 ID
   title_from: text
-  board_regex: "[?&]f=(\\d+)"   # 板號＝數字ID，標題欄另外無板名
+  board_regex: "[?&]f=(\\d+)"     # 板號（數字 ID）

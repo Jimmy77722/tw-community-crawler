@@ -1,3 +1,2 @@
-{"title": "dummy_title_anime_1", "year": "2024", "episodes": "12 eps"}
-{"title": "dummy_title_anime_2", "year": "2025", "episodes": "24 eps"}
-{"title": "dummy_title_anime_3", "year": "2019", "episodes": ""}
+{"site": "ani", "id": "ani-EXAMPLEANIME01", "author": null, "time": "2026-10-05T20:00:00+08:00", "title": "例題動畫 A", "text": null, "url": "https://ani.gamer.com.tw/", "likes": null, "comments": null, "fetched_at": "2026-10-25T00:00:00+08:00"}
+{"site": "ani", "id": "ani-EXAMPLEANIME02", "author": null, "time": null, "title": "例題動畫 B", "text": null, "url": "https://ani.gamer.com.tw/", "likes": null, "comments": null, "fetched_at": "2026-10-25T00:00:00+08:00"}

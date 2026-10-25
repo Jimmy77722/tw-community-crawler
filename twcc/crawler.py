@@ -41,7 +41,20 @@ def _crawl_browser_sync(site: str, cfg: dict, kw: str, cdp_url: str, n: int):
                     page.wait_for_load_state("networkidle", timeout=15_000)
             except Exception as e:
                 log.warning("[%s] 等待內容逾時：%s", site, type(e).__name__)
+            settle = cfg.get("settle_ms")
+            if settle:
+                # Google CSE 等遲遲渲染的結果：再等 settle 毫秒
+                page.wait_for_timeout(int(settle))
             container = cfg["extract"].get("container", "li")
+            if cfg["extract"]["rule"] == "link":
+                # 渲染後 DOM 已就緒（wait_selector 過）：直接吃渲染後的 HTML，重用 link 規則
+                html = page.content()
+                meta = {"url": page.url}
+                posts = parse_html(site, cfg, html)
+                if not posts:
+                    two = page.evaluate("() => document.documentElement.outerHTML.split('\\n').slice(0,2)")
+                    meta["probe"] = "\n".join(two)[:1200]
+                return posts, meta
             blocks = page.eval_on_selector_all(
                 container, "els => els.map(e => e.innerText)")
             posts = parse_text_rule(site, cfg, blocks)

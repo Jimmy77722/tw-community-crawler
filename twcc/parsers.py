@@ -41,16 +41,18 @@ def parse_html(site: str, cfg: dict, html: str) -> list[Post]:
         m_id = id_re.search(href)
         if not m_id:
             continue
-        # 連結自己可能是 pttweb.cc/search 轉貼；真文網址用 url_regex 從 href 或文字解
         m_url = url_re.search(href)
-        url = m_url.group(1) if m_url else href
-        # 若 href 本身已是文章頁就直接用
-        if not m_url and ("topicdetail" in href or "/bbs/" in href):
-            url = href if href.startswith("http") else "https://www." + href.lstrip("/")
-            if "pttweb" in href:
-                m2 = re.search(r"url=(https?://\S+)", href)
-                if m2:
-                    url = m2.group(1)
+        if m_url:
+            url = m_url.group(1)
+        elif href.startswith("http"):
+            url = href
+        else:
+            # 相對 href 用 base_url 組絕對網址（不用登入也不怕 cookie）
+            base = ex.get("base_url")
+            if base:
+                url = base.rstrip("/") + ("/" + href.lstrip("/"))
+            else:
+                url = href
         title = (a.text(strip=True) or "").strip()
         if not title:
             continue

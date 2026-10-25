@@ -1,3 +1,2 @@
-{"title": "dummy_title_reddit_1", "sub": "r/example", "date": "2026-10-25", "link": "https://www.reddit.com/r/example/comments/0000aa/"}
-{"title": "dummy_title_reddit_2", "sub": "r/local", "date": "2026-10-24", "link": "https://www.reddit.com/r/local/comments/0000ab/"}
-{"title": "dummy_title_reddit_3", "sub": "r/example", "date": "2026-10-23", "link": "https://www.reddit.com/r/example/comments/0000ac/"}
+{"site": "reddit", "id": "t3_sample1", "author": "u/example_user", "time": "2026-10-01T10:00:00+08:00", "title": "[Share] I ran an AI model on a mini PC", "text": null, "url": "https://www.reddit.com/r/example/comments/0000aa/", "likes": 42, "comments": 7, "fetched_at": "2026-10-25T00:00:00+08:00"}
+{"site": "reddit", "id": "t3_sample2", "author": "u/example_user2", "time": "2026-10-02T11:30:00+08:00", "title": "Local LLMs on low-power ARM chips", "text": null, "url": "https://www.reddit.com/r/example/comments/0000bb/", "likes": 13, "comments": 2, "fetched_at": "2026-10-25T00:00:00+08:00"}

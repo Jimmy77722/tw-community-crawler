@@ -1,3 +1,2 @@
-{"board": "dummy-board", "title": "dummy_title_dcard_1", "snippet": "dummy_snippet_1", "link": "https://www.dcard.tw/f/dummy-board/p/00000001"}
-{"board": "dummy-board2", "title": "dummy_title_dcard_2", "snippet": "dummy_snippet_2", "link": "https://www.dcard.tw/f/dummy-board2/p/00000002"}
-{"board": "dummy-board3", "title": "dummy_title_dcard_3", "snippet": "dummy_snippet_3", "link": "https://www.dcard.tw/f/dummy-board3/p/00000003"}
+{"site": "dcard", "id": "dcard-EXAMPLETITLE01", "author": "example_author", "time": "2026-10-03T09:00:00+08:00", "title": "[討論] 本地 AI 跑起來順嗎？", "text": null, "url": "https://www.dcard.tw/f/example-board/p/00000001", "likes": null, "comments": null, "fetched_at": "2026-10-25T00:00:00+08:00"}
+{"site": "dcard", "id": "dcard-EXAMPLETITLE02", "author": "example_author2", "time": "2026-10-04T12:00:00+08:00", "title": "[心得] 文書機跑 AI 的一週心得", "text": null, "url": "https://www.dcard.tw/f/example-board/p/00000002", "likes": null, "comments": null, "fetched_at": "2026-10-25T00:00:00+08:00"}
