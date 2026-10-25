@@ -2,6 +2,8 @@ output/
 __pycache__/
 *.pyc
 .cache/
+.venv/
+*.egg-info/
 
 # 本機專用：登入狀態與輸出，不進公repo
 auth/

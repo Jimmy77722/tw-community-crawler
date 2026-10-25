@@ -7,7 +7,7 @@ max_items: 18
 extract:
   rule: text-rule         # 未登入時 <a> 的 href 渲染不出來，改用卡片文字行
   container: "article"
-  row_pattern: "^(.+?)\n(.+?)\n(.+)\n(.*)$"   # [看板,作者,時間,標題…]
+  row_pattern: "^(.+?)\n(.+?)\n(.+?)\n(.*)$"   # [看板,作者,時間,標題＋摘要…]（時間欄不貪婪，標題＝第4行起）
   fields:
     board: 1
     author: 2

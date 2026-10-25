@@ -1,0 +1,51 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": null,
+    "dist": 3,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "id": "abc123",
+          "title": "RTX Spark 上手：ARM64 跑本地模型心得",
+          "author": "u_example_user",
+          "selftext": "我把 Qwen 塞進 128GB 統一記憶體的機器，效能比預期好。",
+          "permalink": "/r/LocalLLaMA/comments/abc123/rtx_spark/",
+          "ups": 42,
+          "num_comments": 7,
+          "created_utc": 1762000000.0,
+          "subreddit": "LocalLLaMA"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "def456",
+          "title": "NVIDIA DGX Spark vs RTX Spark",
+          "author": "u_example_user2",
+          "selftext": "",
+          "permalink": "/r/nvidia/comments/def456/dgx_vs_rtx/",
+          "ups": 13,
+          "num_comments": 2,
+          "created_utc": 1762100000.0,
+          "subreddit": "nvidia"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "ghi789",
+          "title": "ARM64 Ollama on Windows",
+          "author": null,
+          "selftext": null,
+          "permalink": "/r/ollama/comments/ghi789/arm64/",
+          "ups": null,
+          "num_comments": null,
+          "created_utc": 1762200000.0,
+          "subreddit": "ollama"
+        }
+      }
+    ]
+  }
+}

@@ -7,15 +7,15 @@ headers:
 # search.json 對無 UA 請求會 403，UA 用誠實可辨識字串（见 http_client）
 extract:
   rule: json
-  items_path: data.children   # JSON 內結果陣列的路徑
+  items_path: data.children   # JSON 內結果陣列的路徑（每筆是 {kind, data:{...}} 包裝）
   fields:
-    id: id
-    title: title
+    id: data.id
+    title: data.title
     author: data.author
-    text: selftext
-    url: "permalink"          # 相對路徑時補網域
+    text: data.selftext
+    url: "data.permalink"     # 相對路徑時補網域
     url_base: "https://www.reddit.com"
     likes: "data.ups"
     comments: "data.num_comments"
-  time_field: created_utc     # epoch 秒 → ISO 8601（Asia/Taipei）
+  time_field: data.created_utc   # epoch 秒 → ISO 8601（Asia/Taipei）
   id_prefix: "t3_"            # Reddit 文章 ID 前綴

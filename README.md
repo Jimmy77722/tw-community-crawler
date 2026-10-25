@@ -56,6 +56,17 @@
 2. 只改對應站的 `sites/<站>.yaml`（網址樣板、method、選擇器、欄位對應），不動程式和其他站。
 3. 修好後更新該站的實測備註。
 
+## 測試（離線）
+
+```bash
+pip install -e ".[dev]"
+python -m pytest -q
+```
+
+- 測試全部離線：parse／http／crawler 三層吃 `tests/fixtures/` 樣板，不打任何真實站點，也不開瀏覽器。
+- Reddit `search.json` 對本機 IP 常 403，故用 fixture 離線驗證欄位對應（`data.*` 路徑、`id_prefix`、epoch→台北時間）。
+- GitHub Actions（`.github/workflows/ci.yml`）同樣只跑離線測試，Python 3.10／3.13 雙版本矩陣。
+
 ## samples/
 
 各站輸出的範例（每行一筆 JSON）。全部已去識別化：虛構帳號（user_1）、虛構內文、虛構連結，
