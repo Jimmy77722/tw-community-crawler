@@ -1,0 +1,14 @@
+# Dcard：公開 JSON 端點失敗時退回瀏覽器（本輪實測 public v3 搜尋 404）
+site: dcard
+method: browser
+search_url: "https://www.dcard.tw/search?query={kw}"
+wait_selector: "article"
+max_items: 18
+extract:
+  rule: text-rule         # 未登入時 <a> 的 href 渲染不出來，改用卡片文字行
+  container: "article"
+  row_pattern: "^(.+?)\n(.+?)\n(.+)\n(.*)$"   # [看板,作者,時間,標題…]
+  fields:
+    board: 1
+    author: 2
+    title: "$rest-first"        # 規則後面沒用完的行→標題，摘要→text

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tw-community-crawler"
+version = "0.2.0"
+description = "台灣常用社群關鍵字抓取範例（免登入 5 站），受 MediaCrawler 啟發"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx",
+    "pydantic>=2",
+    "pyyaml",
+    "selectolax",
+    "tenacity",
+]
+
+[project.optional-dependencies]
+browser = ["playwright"]
+dev = ["pytest"]
+
+[project.scripts]
+tw-crawler = "twcc.main:main"
+
+[tool.setuptools]
+packages = ["twcc"]

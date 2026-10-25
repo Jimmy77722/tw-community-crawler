@@ -1,0 +1,13 @@
+# Mobile01：googlesearch.php（searchresult.php 已 404）
+site: m01
+method: html
+search_url: "https://www.mobile01.com/googlesearch.php?query={kw}"
+wait_selector: null
+max_items: 20
+extract:
+  rule: link
+  container: "a"
+  link_filter: "topicdetail"
+  id_regex: "[?&]t=(\\d+)"
+  title_from: text
+  board_regex: "[?&]f=(\\d+)"   # 板號＝數字ID，標題欄另外無板名

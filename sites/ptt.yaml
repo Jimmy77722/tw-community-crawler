@@ -1,0 +1,15 @@
+# PTT：免登入，pttweb.cc 全站搜尋（Google CSE 渲染的純 HTML）
+site: ptt
+method: html            # api / html / browser
+search_url: "https://pttweb.cc/search?q={kw}"
+wait_selector: null     # 純 HTML 不需等 JS
+max_items: 20
+extract:
+  rule: link
+  container: "a"
+  link_filter: "/bbs/"          # href 需含此字串
+  id_regex: "/bbs/\\w+/(M\\.\\d+)"   # PTT 文章 ID
+  url_regex: "(https?://www\\.ptt\\.cc/bbs/\\S+?\\.html)"
+  title_from: text
+  board_regex: "/bbs/(\\w+)/"
+  # pttweb 的 over18 cookie 屬本機態，public 版不帶 cookie

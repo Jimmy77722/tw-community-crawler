@@ -1,0 +1,14 @@
+# 巴哈動畫瘋：搜尋頁是 XHR 純渲染（無 <a>），用瀏覽器＋文字行錨點
+site: ani
+method: browser
+search_url: "https://ani.gamer.com.tw/search.php?keyword={kw}"
+wait_selector: "#aniList"
+max_items: 18
+extract:
+  rule: text-rule
+  container: "li"
+  anchor_line: "^\\d{4}年$"      # 「年份：」行上一行＝作品名
+  fields:
+    title: -1                  # 錨點上一行
+    anchor: 0                  # 年份行本身
+  note: "無板塊概念；詳情頁需另開 SN 單頁"
