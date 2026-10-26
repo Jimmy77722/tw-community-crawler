@@ -23,10 +23,18 @@ for _p in ("pydantic", "yaml", "httpx", "tenacity", "selectolax"):
         print(f"[tw-crawler] 缺依賴 {_p}，先： pip install -e .", file=sys.stderr)
         raise SystemExit(2)
 
-from .config import list_sites
-from .crawler import crawl_site
+from .config import list_sites, load_site
+from .crawler import crawl_site, anonymize_items
 
 DEFAULT_CDP = os.environ.get("CRAWLER_CDP_URL", "http://127.0.0.1:9222")
+
+LOGIN_WARNING = (
+    "⚠️ 登入風險宣告：X／IG／Threads 需登入才能抓，本專案不碰你的帳密與 cookie"
+    "（只用你自己已登入的瀏覽器分頁）。\n"
+    "   平台條款大多禁止未經授權的自動抓取，可能導致帳號被限制或停用；抓到 0 筆"
+    "（登入牆改版）請 sites/<站>.yaml 隨 DOM 調整。X 建議改用官方 API。\n"
+    "   已預設從嚴：每站至少 10 秒抓一次、單次上限 50 筆、作者名稱雜湊藏名。"
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -46,6 +54,10 @@ def build_parser() -> argparse.ArgumentParser:
                     help="除錯：原回傳內容存 output/<站>_raw.html")
     ap.add_argument("--html", action="store_true",
                     help="抓完從同一批結果產出 output/<站>_<關鍵字>_<時間>.html 預覽")
+    ap.add_argument("--i-understand-login-risk", action="store_true",
+                    help="表明你懂 X/IG/Threads 需登入且風險自負（這三站不加不跑）")
+    ap.add_argument("--keep-author", action="store_true",
+                    help="登入站保留作者原樣（預設雜湊成 user_<hash8>）")
     ap.add_argument("--jsonl", action="store_true", default=True,
                     help="結果寫 <站>_關鍵詞_日付.jsonl（預設開）")
     return ap
@@ -78,7 +90,6 @@ def main(argv=None) -> int:
 
     # --probe：只探 DOM，不抽欄位
     if args.probe:
-        from .config import load_site
         for site in sites:
             cfg = load_site(site)
             url = cfg["search_url"].format(kw=urllib.parse.quote(args.kw), n=args.n)
@@ -86,10 +97,21 @@ def main(argv=None) -> int:
         return 0
 
     failures = []
+    login_gated = [s for s in sites if load_site(s).get("login_required")]
+    if login_gated and not args.i_understand_login_risk:
+        print(LOGIN_WARNING)
+        print(f"→ 未加 --i-understand-login-risk，跳過需登入站點："
+              f"{'、'.join(login_gated)}")
+        sites = [s for s in sites if s not in login_gated]
+        if not sites:
+            return 0
+    elif login_gated:
+        print(LOGIN_WARNING)
     for site in sites:
         print(f"== [{site}] {time.strftime('%H:%M:%S')}")
         result = crawl_site(site, args.kw, args.n, out_dir, args.cdp, args.probe,
-                         save_html=args.save_html)
+                         save_html=args.save_html,
+                         keep_author=args.keep_author)
         print(json.dumps(result, ensure_ascii=False, indent=2)[:2000])
         if result.get("error") in ("EMPTY", "RATE_LIMIT", "ERROR"):
             failures.append((site, result.get("error"), result.get("reason", "")))

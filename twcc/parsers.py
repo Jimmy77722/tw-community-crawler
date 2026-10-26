@@ -138,7 +138,8 @@ def parse_text_rule(site: str, cfg: dict, texts: list[str]) -> list[Post]:
                 text = " ".join(rest_lines[1:]).strip() or None
                 pid = f"{site}-" + re.sub(r"\W+", "", title)[:24]
                 posts.append(Post(site=site, id=pid, author=author, title=title,
-                                  text=text, url=f"https://www.dcard.tw", fetched_at=now_iso()))
+                                  text=text, url=ex.get("base_url", "https://www.dcard.tw"),
+                                  fetched_at=now_iso()))
         elif anchor:
             are = re.compile(anchor)
             for i, ln in enumerate(lines):

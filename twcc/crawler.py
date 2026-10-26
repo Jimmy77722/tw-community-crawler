@@ -69,8 +69,22 @@ def _crawl_browser_sync(site: str, cfg: dict, kw: str, cdp_url: str, n: int):
             page.close()               # 只關自己開的分頁，不關使用者的瀏覽器
 
 
+def anonymize_items(items: list[dict]) -> list[dict]:
+    """登入站去識別化：作者一律雜湊成 user_<sha1前8碼>；不存頭像與個人頁網址。"""
+    import hashlib
+    out = []
+    for it in items:
+        it = dict(it)
+        if it.get("author"):
+            h = hashlib.sha1(it["author"].encode("utf-8")).hexdigest()[:8]
+            it["author"] = f"user_{h}"
+        out.append(it)
+    return out
+
+
 def crawl_site(site: str, kw: str, n: int, out_dir, cdp_url: str,
-               probe: bool = False, save_html: bool = False):
+               probe: bool = False, save_html: bool = False,
+               keep_author: bool = False):
     """回傳 dict：{'site','count','items':[...]}；抓 0 筆含 probe 供重探。"""
     cfg = load_site(site)
     url = cfg["search_url"].format(kw=urllib.parse.quote(kw), n=n)
@@ -112,6 +126,8 @@ def crawl_site(site: str, kw: str, n: int, out_dir, cdp_url: str,
     # 單次上限筆數：取 CLI --n 與站點 max_items 中較嚴者
     uniq = uniq[: min(n, cfg.get("max_items", 20))]
     items = [p.model_dump() for p in uniq]
+    if cfg.get("login_required") and not keep_author:
+        items = anonymize_items(items)   # 登入站預設去識別化（作者雜湊）
     result = {"site": site, "count": len(items), "items": items,
               "fetched_at": now_iso(), **meta}
     if not items:

@@ -1,0 +1,7 @@
+{
+ "_note": "Threads 搜尋頁假資料（手寫）：article 卡片 innerText 陣列；帳號全假。",
+ "blocks": [
+  "@user_t1\nThreads測試一\n3h\n假貼文第一則\n接第二行",
+  "@user_t2\nThreads測試二\n6h\n假貼文第二則只有首行"
+ ]
+}

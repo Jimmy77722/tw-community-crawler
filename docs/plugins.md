@@ -23,6 +23,9 @@
 ## 警語與免責（與 README 相同）
 
 - 本專案只內建**免登入的公開頁面**：PTT、Dcard、Reddit、Mobile01、巴哈動畫瘋。
+- 需登入三站（X、IG、Threads）預設關閉，加 `--i-understand-login-risk` 才跑；
+  走 `--cdp` 用你自己已登入的 Chrome，不碰帳密與 cookie 檔；限速至少 10 秒、`--n` 上限 50；
+  作者欄預設雜湊 `user_<hash8>`（`--keep-author` 保留原樣），不存頭像與個人頁網址。
 - X（Twitter）、IG、Threads 等**需要登入**的平台，使用條款大多禁止未經授權的
   自動抓取；使用帳號 cookie 抓取可能導致**帳號被限制或停用**。
 - 如果要合規取得 X 的資料，建議使用 **X 官方 API**。

@@ -1,0 +1,19 @@
+# Instagram：需登入、預設關閉、風險自負。走使用者自己已登入的 Chrome（--cdp）。
+# 走標籤頁（關鍵字請挑單字標籤，多字用底線），網格卡片 innerText：[按讚數, 留言數, 時間, 內文…]。
+# 作者輸出一律雜湊成 user_<hash8>（--keep-author 才保留原樣）。
+site: ig
+method: browser
+login_required: true
+search_url: "https://www.instagram.com/explore/tags/{kw}/"
+wait_selector: "section a"
+rate_limit: [10, 20]
+max_items: 50
+extract:
+  rule: text-rule
+  container: "section a"
+  row_pattern: "^(.+?)\n(.+?)\n(.+?)\n(.*)$"
+  base_url: "https://www.instagram.com"
+  fields:
+    board: 1
+    author: 2
+    title: "$rest-first"

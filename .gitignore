@@ -10,3 +10,7 @@ auth/
 output/
 *.session.json
 *.state.json
+*cookie*
+*session*
+*.har
+browser_profile/

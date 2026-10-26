@@ -4,7 +4,7 @@ import pytest
 
 from twcc.config import SITES_DIR, list_sites, load_site
 
-EXPECTED_SITES = ["ani", "dcard", "m01", "ptt", "reddit"]
+EXPECTED_SITES = ["ani", "dcard", "ig", "m01", "ptt", "reddit", "threads", "x"]
 
 
 def test_list_sites():

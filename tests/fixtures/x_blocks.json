@@ -1,0 +1,8 @@
+{
+ "_note": "X 搜尋頁假資料（手寫，非真實抓取）：article 卡片 innerText 陣列。帳號全是假的。",
+ "blocks": [
+  "@user_x1\n顯示名.one\n2h\n今天 RTX Spark 本地跑模型很順\n推！关键字 AI Agent",
+  "@user_x2\n測試者二号\n5h\n第二則假推文只有首行",
+  "@user_x3\n某个人\n1d\n第三則假推文\n多一行備援"
+ ]
+}

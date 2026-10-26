@@ -1,0 +1,18 @@
+# Threads：需登入、預設關閉、風險自負。走使用者自己已登入的 Chrome（--cdp）。
+# 作者輸出一律雜湊成 user_<hash8>（--keep-author 才保留原樣）。
+site: threads
+method: browser
+login_required: true
+search_url: "https://www.threads.com/search?q={kw}"
+wait_selector: "article"
+rate_limit: [10, 20]
+max_items: 50
+extract:
+  rule: text-rule      # 貼文卡片 innerText：[@帳號, 顯示名, 時間, 內文…]
+  container: "article"
+  row_pattern: "^(.+?)\n(.+?)\n(.+?)\n(.*)$"
+  base_url: "https://www.threads.com"
+  fields:
+    board: 1
+    author: 2
+    title: "$rest-first"
