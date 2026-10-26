@@ -28,6 +28,18 @@ from .crawler import crawl_site, anonymize_items
 
 DEFAULT_CDP = os.environ.get("CRAWLER_CDP_URL", "http://127.0.0.1:9222")
 
+
+def _configure_stdio():
+    """啟動時把 stdout／stderr 固定成 UTF-8（容錯）：避免 Windows cp950 控制台
+    遇上 ⚠️、→ 這類字元時 print 直接 UnicodeEncodeError 當掉。"""
+    for name in ("stdout", "stderr"):
+        stream = getattr(sys, name, None)
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (OSError, ValueError):
+                pass   # 非 TextIOWrapper／已被 detach：原樣就好
+
 LOGIN_WARNING = (
     "⚠️ 登入風險宣告：X／IG／Threads 需登入才能抓，本專案不碰你的帳密與 cookie"
     "（只用你自己已登入的瀏覽器分頁）。\n"
@@ -78,6 +90,7 @@ def _preview_args(argv: list[str]) -> int:
 
 
 def main(argv=None) -> int:
+    _configure_stdio()
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv and argv[0] == "preview":
         return _preview_args(argv[1:])
