@@ -44,12 +44,31 @@ def build_parser() -> argparse.ArgumentParser:
                     help="只開目標頁印 DOM 首兩行，不抽欄位")
     ap.add_argument("--save-html", action="store_true",
                     help="除錯：原回傳內容存 output/<站>_raw.html")
+    ap.add_argument("--html", action="store_true",
+                    help="抓完從同一批結果產出 output/<站>_<關鍵字>_<時間>.html 預覽")
     ap.add_argument("--jsonl", action="store_true", default=True,
                     help="結果寫 <站>_關鍵詞_日付.jsonl（預設開）")
     return ap
 
 
+def _preview_args(argv: list[str]) -> int:
+    """子指令：tw-crawler preview <jsonl檔> [更多 jsonl...] [--out 檔.html] [--kw 字]"""
+    ap = argparse.ArgumentParser(prog="tw-crawler preview",
+                                 description="把既有 jsonl 轉成單一 html 預覽檔")
+    ap.add_argument("jsonl", nargs="+", help="既有的 .jsonl 檔（可多個）")
+    ap.add_argument("--out", default=None, help="輸出 html 路徑（預設同檔名 .html）")
+    ap.add_argument("--kw", default="", help="摘要顯示的關鍵字")
+    args = ap.parse_args(argv)
+    from .preview import render_preview
+    out = render_preview(args.jsonl, out_path=args.out, kw=args.kw)
+    print(f"→ 預覽 {out}")
+    return 0
+
+
 def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "preview":
+        return _preview_args(argv[1:])
     args = build_parser().parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     sites = list_sites() if "all" in args.sites else sorted(set(args.sites))
@@ -80,6 +99,12 @@ def main(argv=None) -> int:
                 for item in result["items"]:
                     f.write(json.dumps(item, ensure_ascii=False) + "\n")
             print(f"→ 存 {fn}（{result['count']} 筆）")
+        if args.html and result["count"]:
+            from .preview import render_html
+            stamp = time.strftime("%Y%m%d_%H%M%S")
+            html_fn = out_dir / f"{site}_{urllib.parse.quote(args.kw)[:24]}_{stamp}.html"
+            html_fn.write_text(render_html(result["items"], kw=args.kw), encoding="utf-8")
+            print(f"→ 預覽 {html_fn}")
     if failures:
         print("\n失敗站點：", "; ".join(f"{s}:{e}（{r}）" for s, e, r in failures))
     return 0

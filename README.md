@@ -2,6 +2,13 @@
 
 台灣常用社群關鍵字抓取方法彙整——參考 [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) 的專案寫法（平台模組化、設定集中），把「各站怎麼抓、結構長什麼樣、板塊怎麼辨識」定義成可重用的腳本。**受 MediaCrawler 啟發，未包含其程式碼。**
 
+> **⚠️ 使用警語與免責**
+> - 本專案只內建**免登入的公開頁面**：PTT、Dcard、Reddit、Mobile01、巴哈動畫瘋。
+> - X（Twitter）、IG、Threads 等需登入平台，使用條款大多**禁止未經授權的自動抓取**；用帳號 cookie 抓取可能導致**帳號被限制或停用**。要合規取得 X 資料，建議用 **X 官方 API**。
+> - 請自行遵守各站**服務條款與 robots.txt**，並保持限速。
+> - 抓到的資料可能含**個人資料**：遵守個資法，不得用來識別、追蹤或騷擾個人，也不得轉售。
+> - 本專案按現狀提供（MIT），作者不對使用後果負責。
+
 > ⚠️ 各站方法都是「某一天的實測定義」，網站一改版就可能作廢。所以腳本抓 0 筆時會回傳 `{'error':'EMPTY','probe':<頁面首兩行>}`，
 > 讓你能立刻重探 DOM、修正腳本，而不是假裝流程永遠成立。
 
@@ -43,6 +50,20 @@
 抓 0 筆時回 `{count:0, error:"EMPTY", probe:<首兩行DOM>}`——probe 就是給你重探結構用的。
 結果另存 `output/<站>_<關鍵字>_<日期>.jsonl`（一行一筆；輸出目錄不進版控）。`samples/` 附輸出範例。
 
+## HTML 預覽
+
+```bash
+tw-crawler ptt reddit --kw "AI Agent" --n 10 --html    # 抓完直接產 <站>_<關鍵字>_<時間>.html
+tw-crawler preview output/ptt_AI.jsonl --out 預覽.html  # 既有 jsonl 隨時轉 html
+```
+
+- 單一 html 檔、CSS/JS 全內嵌、不連外部 CDN，離線雙擊就能開。
+- 上方摘要（關鍵字、各站筆數、抓取時間），下方每篇一張卡片：站名、標題、時間、
+  內文前 150 字、原文連結（新分頁開）。
+- 站名篩選與關鍵字搜尋是純前端 JS，資料內嵌在頁面裡。
+- 所有文字經 HTML escape：抓回來的內容不會在頁面上變成可執行的程式碼。
+- 範例見 `samples/preview_example.html`。
+
 ## 禮貌爬取
 
 - 限速：每次請求（含開瀏覽器頁面前）同站隨機等 2–5 秒；站點可在 yaml 用 `rate_limit: [lo, hi]` 覆寫。
@@ -72,9 +93,22 @@ python -m pytest -q
 各站輸出的範例（每行一筆 JSON）。全部已去識別化：虛構帳號（user_1）、虛構內文、虛構連結，
 不含任何真實帳號、貼文全文或個人資訊。
 
+## 外掛開發
+
+本專案不靠 Python plugin 註冊表：**一站一支 `sites/<站>.yaml`**（method／search_url／extract 規則）。
+新增站点＝加 yaml＋fixtures＋假樣本，主程式不動。細節見 `docs/plugins.md`。
+
+## 常見問題
+
+- **抓到 0 筆（`EMPTY`）**：網站改版了。結果會附 `probe`（頁面首兩行）；加 `--save-html`
+  重跑對照 DOM，只修該站 yaml 的選擇器／規則，不動程式。
+- **403（Mobile01、Reddit 常見）**：站方擋資料中心 IP 或防爬。腳本會禮貌停止並回報
+  `RATE_LIMIT`，**不重試硬闖**；換住宅 IP／时段再跑，Reddit 亦可先用 fixtures 驗證欄位。
+- **429**：短時間請求太密。拉大 `rate_limit`、減 `--n`、避開尖峰；同站两次請求間必等 2–5 秒。
+
 ## 免責
 
-僅供學習與研究使用；請遵守各平台服務條款，控制頻率、勿大規模抓取。
+僅供學習與研究使用；詳情見開頭警語與 `docs/plugins.md`。
 
 ## License
 

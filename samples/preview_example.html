@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tw-crawler 預覽 AI</title>
+<style>
+:root { color-scheme: light dark; }
+body { font-family: system-ui, "Microsoft JhengHei", sans-serif;
+       margin: 0; padding: 1.2rem; max-width: 880px; margin-inline: auto; }
+h1 { font-size: 1.2rem; margin: 0 0 .4rem; }
+.summary { font-size: .9rem; opacity: .85; margin-bottom: .6rem; }
+.summary span { margin-right: .9rem; }
+.controls { position: sticky; top: 0; background: Canvas; padding: .5rem 0;
+            display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+            border-bottom: 1px solid rgba(128,128,128,.3); }
+.controls input { flex: 1 1 12rem; padding: .35rem .5rem; }
+.chip { border: 1px solid rgba(128,128,128,.5); border-radius: 999px;
+        padding: .15rem .6rem; cursor: pointer; font-size: .85rem; user-select: none; }
+.chip.off { opacity: .35; text-decoration: line-through; }
+.card { border: 1px solid rgba(128,128,128,.35); border-radius: .5rem;
+        padding: .7rem .8rem; margin: .6rem 0; }
+.card .meta { font-size: .8rem; opacity: .75; display: flex; flex-wrap: wrap; gap: .6rem; }
+.card h2 { font-size: 1rem; margin: .3rem 0; }
+.card .snippet { font-size: .9rem; white-space: pre-line; }
+.badge { font-size: .75rem; border: 1px solid currentColor; border-radius: .3rem;
+         padding: 0 .35rem; }
+a { text-decoration: none; }
+.hidden { display: none; }
+#count { font-size: .85rem; opacity: .7; margin-top: .5rem; }
+</style>
+</head>
+<body>
+<h1>tw-crawler 預覽</h1>
+<div class="summary"><span>關鍵字:<b>AI</b></span><span>筆數:ani 2, dcard 2, m01 2, ptt 2, reddit 2</span><span>抓取日:2026-10-25</span><span>產生時間:2026-10-26T08:58:50+08:00</span></div>
+<div class="controls">
+  <input id="q" type="search" placeholder="關鍵字搜尋（標題＋內文）" data-default-site="全部">
+  <span id="chips"></span>
+</div>
+<div id="count"></div>
+<div id="cards"><article class="card" data-site="ptt" data-hay="ptt [心得] 本地跑 ai 模型的心得  user_1"><div class="meta"><span class="badge">ptt</span> 作者:user_1</div><h2><a href="https://www.ptt.cc/bbs/Sampleboard/M.1700000001.A.SAM.html" target="_blank" rel="noopener noreferrer">[心得] 本地跑 AI 模型的心得</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="ptt" data-hay="ptt re: [問卦] 筆電內建 npu 有用嗎？  user_2"><div class="meta"><span class="badge">ptt</span> 作者:user_2</div><h2><a href="https://www.ptt.cc/bbs/Sampleboard/M.1700000002.A.SAM.html" target="_blank" rel="noopener noreferrer">Re: [問卦] 筆電內建 NPU 有用嗎？</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="dcard" data-hay="dcard [討論] 本地 ai 跑起來順嗎？  user_1"><div class="meta"><span class="badge">dcard</span> 作者:user_1 時間:2026-10-03T09:00:00+08:00</div><h2><a href="https://www.dcard.tw/f/example-board/p/00000001" target="_blank" rel="noopener noreferrer">[討論] 本地 AI 跑起來順嗎？</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="dcard" data-hay="dcard [心得] 文書機跑 ai 的一週心得  user_2"><div class="meta"><span class="badge">dcard</span> 作者:user_2 時間:2026-10-04T12:00:00+08:00</div><h2><a href="https://www.dcard.tw/f/example-board/p/00000002" target="_blank" rel="noopener noreferrer">[心得] 文書機跑 AI 的一週心得</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="m01" data-hay="m01 【評測】ai 筆電實測報告：效率與續航  user_1"><div class="meta"><span class="badge">m01</span> 作者:user_1</div><h2><a href="https://www.mobile01.com/topicdetail.php?f=114&amp;t=7000001" target="_blank" rel="noopener noreferrer">【評測】AI 筆電實測報告：效率與續航</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="m01" data-hay="m01 re: [討論] 本地語音辨識要跑多久？  user_2"><div class="meta"><span class="badge">m01</span> 作者:user_2</div><h2><a href="https://www.mobile01.com/topicdetail.php?f=114&amp;t=7000002" target="_blank" rel="noopener noreferrer">Re: [討論] 本地語音辨識要跑多久？</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="reddit" data-hay="reddit [share] i ran an ai model on a mini pc  user_1"><div class="meta"><span class="badge">reddit</span> 作者:user_1 時間:2026-10-01T10:00:00+08:00 讚:42 留言:7</div><h2><a href="https://www.reddit.com/r/example/comments/0000aa/" target="_blank" rel="noopener noreferrer">[Share] I ran an AI model on a mini PC</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="reddit" data-hay="reddit local llms on low-power arm chips  user_2"><div class="meta"><span class="badge">reddit</span> 作者:user_2 時間:2026-10-02T11:30:00+08:00 讚:13 留言:2</div><h2><a href="https://www.reddit.com/r/example/comments/0000bb/" target="_blank" rel="noopener noreferrer">Local LLMs on low-power ARM chips</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="ani" data-hay="ani 例題動畫 a  "><div class="meta"><span class="badge">ani</span> 時間:2026-10-05T20:00:00+08:00</div><h2><a href="https://ani.gamer.com.tw/" target="_blank" rel="noopener noreferrer">例題動畫 A</a></h2><div class="snippet"></div></article>
+<article class="card" data-site="ani" data-hay="ani 例題動畫 b  "><div class="meta"><span class="badge">ani</span></div><h2><a href="https://ani.gamer.com.tw/" target="_blank" rel="noopener noreferrer">例題動畫 B</a></h2><div class="snippet"></div></article></div>
+<script>
+(function () {
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var chipsBox = document.getElementById('chips');
+  var q = document.getElementById('q');
+  var all = '全部';
+  var site = all;
+  var sites = {};
+  cards.forEach(function (c) { sites[c.dataset.site] = (sites[c.dataset.site] || 0) + 1; });
+  function chip(label) {
+    var el = document.createElement('span');
+    el.className = 'chip'; el.textContent = label; el.dataset.site = label;
+    el.addEventListener('click', function () {
+      site = label;
+      Array.prototype.forEach.call(chipsBox.children, function (ch) {
+        ch.classList.toggle('off', ch.dataset.site !== label);
+      });
+      apply();
+    });
+    chipsBox.appendChild(el);
+  }
+  chip(all);
+  Object.keys(sites).sort().forEach(function (s) { chip(s + '（' + sites[s] + '）'); });
+  function apply() {
+    var kw = q.value.trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c) {
+      var okSite = site === all || c.dataset.site === site;
+      var okKw = !kw || c.dataset.hay.indexOf(kw) !== -1;
+      var show = okSite && okKw;
+      c.classList.toggle('hidden', !show);
+      if (show) shown++;
+    });
+    document.getElementById('count').textContent =
+      '顯示 ' + shown + ' / ' + cards.length + ' 筆';
+  }
+  q.addEventListener('input', apply);
+  apply();
+})();
+</script>
+</body>
+</html>
